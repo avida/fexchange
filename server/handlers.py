@@ -11,7 +11,6 @@ This is file upload server
 @routes.get("/")
 async def handle(request):
     logger.info("Get event")
-    storage.make_directory()
     return web.Response(text=help_text)
 
 def get_dir_and_fname(request):
@@ -19,11 +18,14 @@ def get_dir_and_fname(request):
            request.match_info.get('filename')
 
 @routes.get("/{directory}")
-async def get_directory_content(request):
+async def get_directory(request):
     directory, _ = get_dir_and_fname(request)
     resp_io = storage.get_directory(directory)
     if resp_io:
-        return web.Response(body=resp_io)
+        logger.info(f"Sending {len(resp_io)} bytes")
+        return web.Response(body=resp_io, headers={
+            "Content-Disposition": f'attachment; filename="{directory}.zip"'
+        })
     else:
         return web.Response(status=HTTPStatus.NOT_FOUND)
 
