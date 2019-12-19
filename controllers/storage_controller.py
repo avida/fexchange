@@ -3,6 +3,8 @@ from io import BytesIO
 from asyncio import StreamReader
 from collections import defaultdict
 from zipfile import ZipFile, ZIP_DEFLATED
+import random
+import string
 
 class StorageController:
     def __init__(self):
@@ -38,3 +40,10 @@ class StorageController:
                 with zipfile.open(filename, "w") as fl:
                     fl.write(content)
         return response.getvalue()
+
+    def new_directory(self):
+        for _ in range(0,10):
+            random_name = "".join(random.choices(string.ascii_lowercase+string.digits, k=3))
+            if random_name not in self.directories:
+                return random_name
+        return None

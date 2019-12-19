@@ -41,8 +41,11 @@ async def get_file(request):
 
 @routes.put("/{filename}")
 async def put_handle(request):
-    filename = request.match_info['filename']
-    return await upload_file(request, None, filename)
+    directory, filename = get_dir_and_fname(request)
+    directory = storage.new_directory()
+    if directory is None:
+        return web.Response(status=HTTPStatus.NO_CONTENT)
+    return await upload_file(request, directory, filename)
 
 @routes.put("/{directory}/{filename}")
 async def put_handle(request):
@@ -54,4 +57,4 @@ async def upload_file(request, directory, filename):
     peerinfo = request.transport.get_extra_info("peername")
     logger.info(f"{peerinfo}")
     await storage.save_file(filename, request.content, directory)
-    return web.Response(text="Ok")
+    return web.Response(text=f"dimar.pp.ua/{directory}/{filename}")
